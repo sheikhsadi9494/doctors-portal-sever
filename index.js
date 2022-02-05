@@ -1,8 +1,8 @@
 const { MongoClient } = require('mongodb');
 const express = require('express');
+const cors = require('cors');
 const admin = require("firebase-admin");
 const app = express()
-const cors = require('cors')
 const ObjsectId = require('mongodb').ObjectId;
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SECRET);
@@ -46,7 +46,7 @@ async function run() {
 
         app.get('/appointments', verifyToken, async (req, res) => {
           const email = req.query.email;
-          const date = new Date(req.query.date).toLocaleDateString();
+          const date = req.query.date;
           // console.log(date)
           const query = { email: email, date: date};
           const cursor = appointmentsCollaction.find(query);
@@ -84,6 +84,7 @@ async function run() {
           const email = req.params.email;
           const query = {email: email};
           const user = await usersCollcation.findOne(query);
+          console.log(user);
           let isAdmin = false;
           if(user?.role === 'admin'){
             isAdmin = true;
