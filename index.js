@@ -46,8 +46,9 @@ async function run() {
 
         app.get('/appointments', verifyToken, async (req, res) => {
           const email = req.query.email;
+          console.log('email', email)
           const date = req.query.date;
-          // console.log(date)
+          console.log('date', date)
           const query = { email: email, date: date};
           const cursor = appointmentsCollaction.find(query);
           const appointments = await cursor.toArray();
