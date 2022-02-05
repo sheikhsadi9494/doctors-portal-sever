@@ -12,11 +12,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@stripe/react-stripe-js": "^1.7.0",
+    "@stripe/stripe-js": "^1.22.0",
     "cors": "^2.8.5",
     "curs": "^1.0.2",
     "dotenv": "^14.3.2",
     "express": "^4.17.2",
     "firebase-admin": "^10.0.2",
-    "mongodb": "^4.3.0"
+    "mongodb": "^4.3.0",
+    "stripe": "^8.202.0"
   }
 }

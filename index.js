@@ -3,7 +3,9 @@ const express = require('express');
 const admin = require("firebase-admin");
 const app = express()
 const cors = require('cors')
+const ObjsectId = require('mongodb').ObjectId;
 require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
 const port = process.env.PORT || 5000;
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -52,9 +54,29 @@ async function run() {
           res.json(appointments);
         })
 
+        app.get('/appointments/:id', async (req, res) => {
+          const id = req.params.id;
+          const query = { _id: ObjsectId(id)};
+          const result = await appointmentsCollaction.findOne(query);
+          res.json(result);
+        })
+
         app.post('/appointments', async (req, res) => {
           const appointment = req.body;
           const result = await appointmentsCollaction.insertOne(appointment);
+          res.json(result);
+        })
+
+        app.put('/appointments/:id', async (req, res) => {
+          const id = req.params.id;
+          const payment = req.body;
+          const filter = {_id: ObjsectId(id)};
+          const updateDoc = {
+            $set: {
+              payment: payment
+            }
+          };
+          const result = await appointmentsCollaction.updateOne(filter, updateDoc);
           res.json(result);
         })
 
@@ -102,6 +124,17 @@ async function run() {
           }
         })
 
+        app.post("/create-payment-intent", async (req, res) => {
+          const paymentInfo = req.body;
+          const amount = paymentInfo.price * 100;
+          const paymentIntent = await stripe.paymentIntents.create({
+            currency: "usd",
+            amount: amount,
+            payment_method_types: ['card']
+
+          });
+          res.json({ clientSecret: paymentIntent.client_secret })
+        })
     }
     finally{
         // await client.close();
